@@ -31,6 +31,9 @@ browser to REQUEST a particular resource.
     add import include (from django.urls import path, include)
     update path("", include("app.urls"))
 
+8. Our home page url is now set up. 
+
+
     URL's defined --> Views defined(function) --> logic within the function displayed
 
     User -> Django -> URL -> view -> template or model if model -> data
