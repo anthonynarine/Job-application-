@@ -25,7 +25,15 @@ browser to REQUEST a particular resource.
 
 5. from django.http import HttpResponse needs to be added to the views.py file.
 6. the function must now be imported into our urls.py file
-    from app.views import hello (ctrl space for a shortcut import)
+    1. from . import views (we use . instead of the folder name "app: b/c the url file in 
+       in the same folder as the views file)
+    2. or from app.views import hello (ctrl space for a shortcut import)
+        you will need to import each new created function(view) if method
+        2 is used. 
+
+        path("", view.<function_name>) santzx will be used for 
+        method 1
+           
 
 7. in project urls.py file 
     add import include (from django.urls import path, include)
@@ -37,3 +45,141 @@ browser to REQUEST a particular resource.
     URL's defined --> Views defined(function) --> logic within the function displayed
 
     User -> Django -> URL -> view -> template or model if model -> data
+
+
+
+DYNAMIC URLS
+
+1. we update our function(view) to take in a second parameter e.g below "id"
+def job_detail(request, id):
+    return HttpResponse("Job detail page")
+
+2. we update our url path to accept the seond parameter
+    path("job/<id>",views.job_detail) **note the syntax
+
+
+Returning multiple jobs
+
+1. create two list. 
+    job_title = [
+    "First Job",
+    "Second Job"
+]
+
+
+job_description = [
+    "First job description",
+    "Second job description"
+]
+
+
+2. update function (view) logic
+
+def job_detail(request, id):
+    return_html = f"<h1>{job_title[int(id)]}</h1> <h3>{job_description[int(id)]}"
+
+    return HttpResponse(return_html)
+
+
+
+PATH Converters
+1. instead of typcasing the int method on our id in our function (see above)
+
+2. in our urls.py file we specifiy the id as an int. 
+    path("job/<ind:id>",views.job_detail)
+
+3. we can now removed the typcasted int method in our function. 
+
+    def job_detail(request, id):
+    return_html = f"<h1>{job_title[id]}</h1> <h3>{job_description[id]}"
+
+    return HttpResponse(return_html)
+
+
+    Different types of path converters Django offers
+    
+    1. int matches 0 or any + integer & returns an int value to the view
+
+    2. str django default type as with python.
+
+    3. slug matches any slug string.  slugs are url short labels for specific
+        content. it only contains letters, numbers, underscores or hyphens. 
+
+    4. uuid special field to store universally unique idenfifiers
+
+
+
+REQUESTS:
+    message sent by client to server. 
+
+    Types:
+GET request used to get resources from the server.
+    ~ are only used to read data not change it
+
+POST request used to create resources in the server.
+    ~if you need to create a new resource, a post request will be used. 
+    
+PUT request used to update existing resource that already exist on the server.
+
+Delete request used to delete existing resource on server. 
+
+STATUS codes typically seen. 
+100  informational
+200 request was successful
+300 redirection further action is needed to complete request
+400 error on client side. 
+500 server related errors
+
+
+REDIRECTS
+      django has a built in redirect function which accepts one parameter (a url) 
+      to redirect.  
+
+      redirect needs to be imported.
+        from django.shortcuts import redirect  
+
+
+
+Accessing other URLs in an application
+    django has a reverse() built in function to handle this. 
+    This function will take in two parameters. 
+        ~ a url name which will be a unique identifier that you are allowed to give your urls in urls.py
+        ~ arguements that the function might need
+
+        example of reverse() redirecting clients to the home page
+
+            def job_list(request):
+            """"will iterate over job_title[] and display each job on the home page"""
+            list_of_job = "<ul>"
+            for j in job_title:
+                job_id = job_title.index(j) #the index of j is being saved as job_id then its passed as a url below
+                detail_url = (reverse("jobs_detail", args=(job_id,)))
+                list_of_job += f"<li><a href='{detail_url}'>{j}</a></li>" #<a href'job/{job_id}'></a> is a hyperlink
+            list_of_job += "</ul>"
+            return HttpResponse(list_of_job)
+
+
+
+Error handling
+
+    wrap function in try/except
+
+    def job_detail(request, id):
+
+        try:
+            if id == 0:
+                return redirect(reverse("jobs_home"))  #this will redirect the user to the home screen. 
+            return_html = f"<h1>{job_title[id]}</h1> <h3>{job_description[id]}"
+            return HttpResponse(return_html)
+        except:
+            return HttpResponseNotFound("Not found")  #use Httpresponsenotfound to bring up a 400 error. 
+
+
+
+
+
+
+
+
+
+
